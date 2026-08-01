@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header({ active, userEmail }) {
   return (
@@ -33,6 +34,7 @@ export default function Header({ active, userEmail }) {
       <div className="user-pill">
         <span className="dot-live" />
         <span className="user-email">{userEmail}</span>
+        <ThemeToggle />
         <form action="/auth/signout" method="post">
           <button className="signout-btn" type="submit">
             Sign out

@@ -216,7 +216,7 @@ footer.note{text-align:center; margin-top:34px; font-size:11.5px; color:var(--in
 .subject-hero{
   display:flex; align-items:flex-start; justify-content:space-between;
   gap:16px; padding:18px 20px; border:1px solid var(--border);
-  border-radius:14px; margin-bottom:16px; background:#fff;
+  border-radius:14px; margin-bottom:16px; background:var(--surface);
 }
 .subject-hero h2{ margin:0 0 4px; font-family:'Space Grotesk'; font-size:19px; }
 .subject-hero .sub{ margin:0; color:var(--ink-soft); font-size:13px; }
@@ -230,7 +230,7 @@ a.card{ text-decoration:none; color:inherit; display:block; }
 /* --- Week view (added) --- */
 .week-block{
   border:1px solid var(--border); border-radius:14px;
-  margin-bottom:14px; overflow:hidden; background:#fff;
+  margin-bottom:14px; overflow:hidden; background:var(--surface);
 }
 .week-block-head{
   display:flex; align-items:center; justify-content:space-between;
@@ -248,7 +248,7 @@ a.card{ text-decoration:none; color:inherit; display:block; }
   font-size:13px; font-style:italic;
 }
 
-.topic-group{ padding:6px 16px 2px; }
+.topic-group{ padding:6px 16px 2px calc(16px + (var(--depth, 0) * 18px)); }
 .topic-group-head{
   display:flex; align-items:center; justify-content:space-between;
   padding:6px 0; font-weight:700; font-size:12.5px; color:var(--ink-soft);
@@ -256,7 +256,7 @@ a.card{ text-decoration:none; color:inherit; display:block; }
 .topic-group-rollup{
   font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-faint);
 }
-.week-block .topic-row{ padding:6px 16px; }
+.week-block .topic-row{ padding:6px 16px 6px calc(16px + (var(--depth, 0) * 18px)); }
 
 /* --- Mastered = purple, Goal met = green, segmented week progress bar (added) --- */
 :root{
@@ -269,16 +269,53 @@ a.card{ text-decoration:none; color:inherit; display:block; }
 .week-goal input{ accent-color: var(--emerald); }
 .week-goal:has(input:checked){ color: var(--emerald); font-weight:700; }
 
-.week-progress-bar{ display:flex; gap:3px; height:12px; margin:14px 0 22px; }
+.week-progress-bar{ display:flex; gap:3px; height:12px; margin:14px 0 10px; }
 .week-progress-seg{
-  position:relative; height:100%; background:var(--track);
+  height:100%; background:var(--track);
   border-radius:3px; overflow:hidden; min-width:6px;
+  display:flex; /* lets the fills below sit side-by-side instead of stacked */
 }
 .week-progress-seg.review{
-  background:repeating-linear-gradient(45deg, var(--track) 0 3px, #fff 3px 6px);
+  background:repeating-linear-gradient(45deg, var(--track) 0 3px, var(--surface) 3px 6px);
 }
-.week-progress-fill{
-  position:absolute; left:0; top:0; height:100%;
-  background:var(--purple); transition:width .3s;
+.week-progress-fill{ height:100%; transition:width .3s; }
+.week-progress-fill.mastered{ background:var(--purple); }
+.week-progress-fill.in-progress{ background:var(--amber); }
+.week-progress-fill.relearning{ background:var(--rose); }
+
+.week-progress-legend{ display:flex; gap:14px; flex-wrap:wrap; margin:0 0 22px; }
+.week-progress-legend span{
+  font-size:11px; color:var(--ink-soft); display:flex; align-items:center; gap:5px;
+}
+.week-progress-legend i{ width:8px; height:8px; border-radius:2px; display:inline-block; }
+
+/* --- Dark mode --- */
+[data-theme='dark']{
+  --bg:#14171F;
+  --surface:#1C212C;
+  --ink:#EDEFF4;
+  --ink-soft:#A0A8B8;
+  --ink-faint:#6B7484;
+  --border:#2C3240;
+  --track:#2A2F3B;
+  --purple-soft:#2A2440;
+  --amber-soft:#332A16;
+  --rose-soft:#331E24;
+  --emerald-soft:#173224;
+}
+[data-theme='dark'] .brand-mark{
+  background:linear-gradient(135deg,#2C3547,#4A5570);
+}
+[data-theme='dark'] .status-btn{ filter:brightness(1.15); }
+[data-theme='dark'] .week-progress-seg.review{
+  background:repeating-linear-gradient(45deg, var(--track) 0 3px, var(--bg) 3px 6px);
 }
 
+.theme-toggle{
+  display:flex; align-items:center; justify-content:center;
+  width:34px; height:34px; border-radius:9px;
+  border:1px solid var(--border); background:var(--surface);
+  color:var(--ink-soft); cursor:pointer; transition:.15s;
+}
+.theme-toggle:hover{ color:var(--ink); border-color:var(--ink-faint); }
+.theme-toggle svg{ width:17px; height:17px; }

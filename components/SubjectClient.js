@@ -22,7 +22,7 @@ function TopicNode({ topic, progress, onCycle, depth = 0 }) {
     const status = progress[topic.id] || 'not_started';
     const meta = STATUS_META[status];
     return (
-      <div className="topic-row" style={{ paddingLeft: depth * 16 }}>
+      <div className="topic-row" style={{ '--depth': depth }}>
         <span className="topic-name">{topic.label}</span>
         <button
           className="status-btn"
@@ -42,7 +42,7 @@ function TopicNode({ topic, progress, onCycle, depth = 0 }) {
   ).length;
 
   return (
-    <div className="topic-group" style={{ paddingLeft: depth * 16 }}>
+    <div className="topic-group" style={{ '--depth': depth }}>
       <div className="topic-group-head">
         <span className="topic-group-title">{topic.label}</span>
         <span className="topic-group-rollup">
@@ -73,13 +73,28 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
     if (!weekly) return [];
     return weekly.weeks.map((week) => {
       if (week.reviewWeek) {
-        return { number: week.number, review: true, leafCount: 0, masteredCount: 0 };
+        return {
+          number: week.number,
+          review: true,
+          leafCount: 0,
+          masteredCount: 0,
+          inProgressCount: 0,
+          relearningCount: 0,
+        };
       }
       const leaves = week.topics.flatMap(collectLeaves);
-      const masteredCount = leaves.filter(
-        (l) => (progress[l.id] || 'not_started') === 'mastered'
-      ).length;
-      return { number: week.number, review: false, leafCount: leaves.length, masteredCount };
+      const statuses = leaves.map((l) => progress[l.id] || 'not_started');
+      const masteredCount = statuses.filter((s) => s === 'mastered').length;
+      const inProgressCount = statuses.filter((s) => s === 'in_progress').length;
+      const relearningCount = statuses.filter((s) => s === 'relearning').length;
+      return {
+        number: week.number,
+        review: false,
+        leafCount: leaves.length,
+        masteredCount,
+        inProgressCount,
+        relearningCount,
+      };
     });
   }, [weekly, progress]);
 
@@ -178,32 +193,56 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
       </section>
 
       {weekly && (
-        <div className="week-progress-bar">
-          {weekStats.map((w) => (
-            <div
-              key={w.number}
-              className={`week-progress-seg ${w.review ? 'review' : ''}`}
-              style={{
-                flexGrow: w.review ? 0 : Math.max(w.leafCount, 1),
-                flexBasis: w.review ? 14 : 0,
-              }}
-              title={
-                w.review
-                  ? `Week ${w.number}: Review`
-                  : `Week ${w.number}: ${w.masteredCount}/${w.leafCount} mastered`
-              }
-            >
-              {!w.review && (
-                <div
-                  className="week-progress-fill"
-                  style={{
-                    width: `${w.leafCount ? (w.masteredCount / w.leafCount) * 100 : 0}%`,
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="week-progress-bar">
+            {weekStats.map((w) => (
+              <div
+                key={w.number}
+                className={`week-progress-seg ${w.review ? 'review' : ''}`}
+                style={{
+                  flexGrow: w.review ? 0 : Math.max(w.leafCount, 1),
+                  flexBasis: w.review ? 14 : 0,
+                }}
+                title={
+                  w.review
+                    ? `Week ${w.number}: Review`
+                    : `Week ${w.number}: ${w.masteredCount} mastered, ${w.inProgressCount} in progress, ${w.relearningCount} relearning (of ${w.leafCount})`
+                }
+              >
+                {!w.review && w.leafCount > 0 && (
+                  <>
+                    <div
+                      className="week-progress-fill mastered"
+                      style={{ width: `${(w.masteredCount / w.leafCount) * 100}%` }}
+                    />
+                    <div
+                      className="week-progress-fill in-progress"
+                      style={{ width: `${(w.inProgressCount / w.leafCount) * 100}%` }}
+                    />
+                    <div
+                      className="week-progress-fill relearning"
+                      style={{ width: `${(w.relearningCount / w.leafCount) * 100}%` }}
+                    />
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="week-progress-legend">
+            <span>
+              <i style={{ background: 'var(--purple)' }} />
+              Mastered
+            </span>
+            <span>
+              <i style={{ background: 'var(--amber)' }} />
+              In progress
+            </span>
+            <span>
+              <i style={{ background: 'var(--rose)' }} />
+              Relearning
+            </span>
+          </div>
+        </>
       )}
 
       {weekly ? (
