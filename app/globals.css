@@ -258,3 +258,27 @@ a.card{ text-decoration:none; color:inherit; display:block; }
 }
 .week-block .topic-row{ padding:6px 16px; }
 
+/* --- Mastered = purple, Goal met = green, segmented week progress bar (added) --- */
+:root{
+  --purple:#6D4AAF;
+  --purple-soft:#EFE9F8;
+  --emerald:#2E9563;
+  --emerald-soft:#E6F4EC;
+}
+
+.week-goal input{ accent-color: var(--emerald); }
+.week-goal:has(input:checked){ color: var(--emerald); font-weight:700; }
+
+.week-progress-bar{ display:flex; gap:3px; height:12px; margin:14px 0 22px; }
+.week-progress-seg{
+  position:relative; height:100%; background:var(--track);
+  border-radius:3px; overflow:hidden; min-width:6px;
+}
+.week-progress-seg.review{
+  background:repeating-linear-gradient(45deg, var(--track) 0 3px, #fff 3px 6px);
+}
+.week-progress-fill{
+  position:absolute; left:0; top:0; height:100%;
+  background:var(--purple); transition:width .3s;
+}
+
