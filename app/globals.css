@@ -205,3 +205,25 @@ footer.note{text-align:center; margin-top:34px; font-size:11.5px; color:var(--in
   body{padding-bottom: env(safe-area-inset-bottom);}
   .shell{padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right));}
 }
+/* --- Subject page (added) --- */
+.back-link{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:13px; font-weight:600; color:var(--ink-soft);
+  text-decoration:none; margin-bottom:18px;
+}
+.back-link:hover{ color:var(--ink); }
+
+.subject-hero{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:16px; padding:18px 20px; border:1px solid var(--border);
+  border-radius:14px; margin-bottom:16px; background:#fff;
+}
+.subject-hero h2{ margin:0 0 4px; font-family:'Space Grotesk'; font-size:19px; }
+.subject-hero .sub{ margin:0; color:var(--ink-soft); font-size:13px; }
+.subject-pct{
+  font-family:'IBM Plex Mono'; font-weight:700; font-size:26px; line-height:1;
+}
+
+/* Cards are now links, so undo default link styling */
+a.card{ text-decoration:none; color:inherit; display:block; }
+
