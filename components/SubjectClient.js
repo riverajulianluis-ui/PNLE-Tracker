@@ -21,14 +21,12 @@ function TopicNode({ topic, progress, onCycle, depth = 0 }) {
   if (isLeaf) {
     const status = progress[topic.id] || 'not_started';
     const meta = STATUS_META[status];
-    const bg = meta.bg;
-    const text = meta.text;
     return (
       <div className="topic-row" style={{ paddingLeft: depth * 16 }}>
         <span className="topic-name">{topic.label}</span>
         <button
           className="status-btn"
-          style={{ background: bg, color: text }}
+          style={{ background: meta.bg, color: meta.text }}
           onClick={() => onCycle(topic.id)}
         >
           <span className="ic">{meta.icon}</span>
@@ -69,6 +67,27 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
   const [weekGoals, setWeekGoals] = useState(initialWeekGoals || {});
   const supabase = useMemo(() => createClient(), []);
   const weekly = WEEKLY_CONTENT[subject.id];
+
+  // Per-week and overall mastery stats, used for the segmented header bar
+  const weekStats = useMemo(() => {
+    if (!weekly) return [];
+    return weekly.weeks.map((week) => {
+      if (week.reviewWeek) {
+        return { number: week.number, review: true, leafCount: 0, masteredCount: 0 };
+      }
+      const leaves = week.topics.flatMap(collectLeaves);
+      const masteredCount = leaves.filter(
+        (l) => (progress[l.id] || 'not_started') === 'mastered'
+      ).length;
+      return { number: week.number, review: false, leafCount: leaves.length, masteredCount };
+    });
+  }, [weekly, progress]);
+
+  const overall = useMemo(() => {
+    const totalLeaves = weekStats.reduce((a, w) => a + w.leafCount, 0) || 1;
+    const totalMastered = weekStats.reduce((a, w) => a + w.masteredCount, 0);
+    return { pct: Math.round((totalMastered / totalLeaves) * 100), totalLeaves, totalMastered };
+  }, [weekStats]);
 
   // --- New week-view save functions ---
   async function cycleWeeklyStatus(topicId) {
@@ -146,10 +165,46 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
         <div>
           <h2 style={{ color: subject.accent }}>{subject.name}</h2>
           <p className="sub">
-            {weekly ? 'Week-by-week coverage' : `${subject.topics.length} topics`}
+            {weekly
+              ? `${overall.totalMastered} of ${overall.totalLeaves} topics mastered`
+              : `${subject.topics.length} topics`}
           </p>
         </div>
+        {weekly && (
+          <div className="subject-pct" style={{ color: 'var(--purple)' }}>
+            {overall.pct}%
+          </div>
+        )}
       </section>
+
+      {weekly && (
+        <div className="week-progress-bar">
+          {weekStats.map((w) => (
+            <div
+              key={w.number}
+              className={`week-progress-seg ${w.review ? 'review' : ''}`}
+              style={{
+                flexGrow: w.review ? 0 : Math.max(w.leafCount, 1),
+                flexBasis: w.review ? 14 : 0,
+              }}
+              title={
+                w.review
+                  ? `Week ${w.number}: Review`
+                  : `Week ${w.number}: ${w.masteredCount}/${w.leafCount} mastered`
+              }
+            >
+              {!w.review && (
+                <div
+                  className="week-progress-fill"
+                  style={{
+                    width: `${w.leafCount ? (w.masteredCount / w.leafCount) * 100 : 0}%`,
+                  }}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
 
       {weekly ? (
         weekly.weeks.map((week) => (
@@ -191,14 +246,12 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
             const key = flatTopicKey(subject.id, idx);
             const status = progress[key] || 'not_started';
             const meta = STATUS_META[status];
-            const bg = status === 'mastered' ? subject.accent : meta.bg;
-            const text = status === 'mastered' ? '#fff' : meta.text;
             return (
               <div className="topic-row" key={key}>
                 <span className="topic-name">{t}</span>
                 <button
                   className="status-btn"
-                  style={{ background: bg, color: text }}
+                  style={{ background: meta.bg, color: meta.text }}
                   onClick={() => cycleFlatStatus(idx)}
                 >
                   <span className="ic">{meta.icon}</span>
