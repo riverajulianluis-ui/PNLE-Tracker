@@ -57,7 +57,7 @@ header.top{
 .brand{display:flex; align-items:center; gap:12px;}
 .brand-mark{
   width:40px;height:40px;border-radius:11px;
-  background:linear-gradient(135deg,#1B2230,#3A4356);
+  background:linear-gradient(135deg,#F0384F,#A6182F);
   display:flex;align-items:center;justify-content:center;
   box-shadow:var(--shadow-sm);
 }
@@ -169,6 +169,8 @@ nav.tabs a:hover:not(.active){background:var(--bg); color:var(--ink);}
 .ghost-btn:hover{color:var(--ink); border-color:var(--ink-faint);}
 
 footer.note{text-align:center; margin-top:34px; font-size:11.5px; color:var(--ink-faint);}
+.credits{text-align:center; margin-top:6px; font-size:11px; color:var(--ink-faint); letter-spacing:.01em;}
+.login-card .credits{margin-top:22px;}
 
 .loading-screen{display:flex; align-items:center; justify-content:center; height:60vh; flex-direction:column; gap:10px; color:var(--ink-soft); font-size:13px;}
 .spinner{width:22px;height:22px;border-radius:50%;border:2.5px solid var(--border); border-top-color:var(--ink); animation:spin .8s linear infinite;}
@@ -322,7 +324,7 @@ a.card{ text-decoration:none; color:inherit; display:block; }
   --status-relearning-text:#E8899C;
 }
 [data-theme='dark'] .brand-mark{
-  background:linear-gradient(135deg,#2C3547,#4A5570);
+  background:linear-gradient(135deg,#FF5468,#C22A42);
 }
 [data-theme='dark'] .week-progress-seg.review{
   background:repeating-linear-gradient(45deg, var(--track) 0 3px, var(--bg) 3px 6px);
