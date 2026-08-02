@@ -13,9 +13,17 @@ export default async function DashboardPage() {
     .select('subject_id, topic_idx, status')
     .eq('user_id', user.id);
 
+  const { data: weeklyRows } = await supabase
+    .from('week_topic_progress')
+    .select('topic_id, status')
+    .eq('user_id', user.id);
+
   const initialProgress = {};
   (rows || []).forEach((r) => {
     initialProgress[`${r.subject_id}::${r.topic_idx}`] = r.status;
+  });
+  (weeklyRows || []).forEach((r) => {
+    initialProgress[r.topic_id] = r.status;
   });
 
   return (
