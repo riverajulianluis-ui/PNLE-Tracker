@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Header from '@/components/Header';
 import DashboardClient from '@/components/DashboardClient';
+import Credits from '@/components/Credits';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -31,6 +32,7 @@ export default async function DashboardPage() {
       <Header active="dashboard" userEmail={user.email} />
       <DashboardClient initialProgress={initialProgress} userId={user.id} />
       <footer className="note">Your progress is private and saved to your account.</footer>
+      <Credits />
     </div>
   );
 }
