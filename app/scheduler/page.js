@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import Header from '@/components/Header';
 import SchedulerClient from '@/components/SchedulerClient';
+import Credits from '@/components/Credits';
 
 export default async function SchedulerPage() {
   const supabase = await createClient();
@@ -26,6 +27,7 @@ export default async function SchedulerPage() {
       <Header active="scheduler" userEmail={user.email} />
       <SchedulerClient initialSchedule={initialSchedule} userId={user.id} />
       <footer className="note">Your schedule is private and saved to your account.</footer>
+      <Credits />
     </div>
   );
 }
