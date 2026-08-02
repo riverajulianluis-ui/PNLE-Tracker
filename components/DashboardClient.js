@@ -3,15 +3,24 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { SUBJECTS, STATUS_ORDER } from '@/lib/subjects';
+import { getWeeklyLeafTopics } from '@/lib/weeklyContent';
 
 function topicKey(subjectId, idx) {
   return `${subjectId}::${idx}`;
 }
 
+// The real, checkable topic ids for a subject: its weekly sub-topics if it
+// has a weekly view, otherwise the old flat topic list as a fallback.
+function subjectTopicIds(subject) {
+  const weeklyLeaves = getWeeklyLeafTopics(subject.id);
+  if (weeklyLeaves) return weeklyLeaves.map((t) => t.id);
+  return subject.topics.map((_, idx) => topicKey(subject.id, idx));
+}
+
 function subjectCounts(subject, progress) {
   const counts = { not_started: 0, in_progress: 0, mastered: 0, relearning: 0 };
-  subject.topics.forEach((_, idx) => {
-    const st = progress[topicKey(subject.id, idx)] || 'not_started';
+  subjectTopicIds(subject).forEach((id) => {
+    const st = progress[id] || 'not_started';
     counts[st]++;
   });
   return counts;
@@ -88,7 +97,7 @@ export default function DashboardClient({ initialProgress }) {
       <div className="grid">
         {SUBJECTS.map((subject) => {
           const counts = subjectCounts(subject, progress);
-          const total = subject.topics.length;
+          const total = subjectTopicIds(subject).length;
           const p = pct(counts);
           const segWidth = (n) => `${((n / total) * 100).toFixed(2)}%`;
 
