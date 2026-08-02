@@ -8,12 +8,13 @@ export default function Header({ active, userEmail }) {
         <div className="brand-mark">
           <svg viewBox="0 0 24 24" fill="none">
             <path
-              d="M3 12h4l2-7 4 14 2-7h6"
+              d="M2.5 13.5c1.3 0 1.6-3.6 2.9-3.6 1.4 0 1 7.7 2.5 7.7 1.6 0 1.6-13.6 3.2-13.6 1.5 0 1.3 9.5 2.8 9.5h6.6"
               stroke="#fff"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
+            <circle cx="11.4" cy="3.9" r="1" fill="#fff" />
           </svg>
         </div>
         <div>
