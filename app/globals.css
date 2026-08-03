@@ -141,6 +141,13 @@ nav.tabs a:hover:not(.active){background:var(--bg); color:var(--ink);}
 }
 .status-btn:active{transform:scale(.95);}
 .status-btn .ic{font-size:12px; line-height:1;}
+.topic-block{ display:flex; flex-direction:column; gap:4px; }
+.topic-note{
+  width:100%; resize:vertical; min-height:30px; font-family:'Inter'; font-size:12px;
+  padding:6px 10px; border-radius:8px; border:1px solid var(--border, rgba(0,0,0,.08));
+  background:var(--bg); color:var(--ink-soft); line-height:1.35;
+}
+.topic-note:focus{ outline:none; border-color:var(--purple); }
 
 /* ---------- Scheduler ---------- */
 .sched-wrap{background:var(--surface); border:1px solid var(--border); border-radius:20px; padding:22px; box-shadow:var(--shadow-sm);}
@@ -267,7 +274,8 @@ a.card{ text-decoration:none; color:inherit; display:block; }
 .topic-group-rollup{
   font-family:'IBM Plex Mono'; font-size:11px; color:var(--ink-faint);
 }
-.week-block .topic-row{ padding:6px 16px 6px calc(16px + (var(--depth, 0) * 18px)); }
+.week-block .topic-block{ padding:6px 16px 6px calc(16px + (var(--depth, 0) * 18px)); }
+.week-block .topic-block .topic-row{ padding:0; }
 
 /* --- Mastered = purple, Goal met = green, segmented week progress bar (added) --- */
 :root{
