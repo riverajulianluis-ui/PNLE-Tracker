@@ -9,15 +9,16 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: rows } = await supabase
-    .from('topic_progress')
-    .select('subject_id, topic_idx, status')
-    .eq('user_id', user.id);
-
-  const { data: weeklyRows } = await supabase
-    .from('week_topic_progress')
-    .select('topic_id, status')
-    .eq('user_id', user.id);
+  const [{ data: rows }, { data: weeklyRows }] = await Promise.all([
+    supabase
+      .from('topic_progress')
+      .select('subject_id, topic_idx, status')
+      .eq('user_id', user.id),
+    supabase
+      .from('week_topic_progress')
+      .select('topic_id, status')
+      .eq('user_id', user.id),
+  ]);
 
   const initialProgress = {};
   (rows || []).forEach((r) => {
