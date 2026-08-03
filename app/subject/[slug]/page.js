@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Header from '@/components/Header';
 import SubjectClient from '@/components/SubjectClient';
+import Credits from '@/components/Credits';
 import { SUBJECTS } from '@/lib/subjects';
 import { WEEKLY_CONTENT } from '@/lib/weeklyContent';
 
@@ -57,6 +58,8 @@ export default async function SubjectPage({ params }) {
         initialWeekGoals={initialWeekGoals}
         userId={user.id}
       />
+      <footer className="note">Your progress is private and saved to your account.</footer>
+      <Credits />
     </div>
   );
 }
