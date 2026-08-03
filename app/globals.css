@@ -141,6 +141,15 @@ nav.tabs a:hover:not(.active){background:var(--bg); color:var(--ink);}
 }
 .status-btn:active{transform:scale(.95);}
 .status-btn .ic{font-size:12px; line-height:1;}
+.topic-actions{ display:flex; align-items:center; gap:6px; }
+.note-toggle-btn{
+  border:1px dashed var(--border, rgba(0,0,0,.15)); cursor:pointer; font-family:'Inter'; font-weight:600;
+  font-size:10.5px; padding:4px 8px; border-radius:20px; background:transparent; color:var(--ink-soft);
+  white-space:nowrap; transition:.12s;
+}
+.note-toggle-btn:hover{ border-color:var(--purple); color:var(--purple); }
+.note-toggle-btn:active{ transform:scale(.95); }
+.note-toggle-btn.has-note{ border-style:solid; border-color:var(--purple); color:var(--purple); }
 .topic-block{ display:flex; flex-direction:column; gap:4px; }
 .topic-note{
   width:100%; resize:vertical; min-height:30px; font-family:'Inter'; font-size:12px;
