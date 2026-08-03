@@ -15,23 +15,33 @@ function collectLeaves(topic) {
   return topic.children.flatMap(collectLeaves);
 }
 
-function TopicNode({ topic, progress, onCycle, depth = 0 }) {
+function TopicNode({ topic, progress, onCycle, notes, onNoteChange, onNoteSave, depth = 0 }) {
   const isLeaf = !topic.children || topic.children.length === 0;
 
   if (isLeaf) {
     const status = progress[topic.id] || 'not_started';
     const meta = STATUS_META[status];
     return (
-      <div className="topic-row" style={{ '--depth': depth }}>
-        <span className="topic-name">{topic.label}</span>
-        <button
-          className="status-btn"
-          style={{ background: meta.bg, color: meta.text }}
-          onClick={() => onCycle(topic.id)}
-        >
-          <span className="ic">{meta.icon}</span>
-          {meta.label}
-        </button>
+      <div className="topic-block" style={{ '--depth': depth }}>
+        <div className="topic-row">
+          <span className="topic-name">{topic.label}</span>
+          <button
+            className="status-btn"
+            style={{ background: meta.bg, color: meta.text }}
+            onClick={() => onCycle(topic.id)}
+          >
+            <span className="ic">{meta.icon}</span>
+            {meta.label}
+          </button>
+        </div>
+        <textarea
+          className="topic-note"
+          placeholder="Add a note (e.g. 'Needs more work on this part')"
+          value={notes[topic.id] || ''}
+          onChange={(e) => onNoteChange(topic.id, e.target.value)}
+          onBlur={() => onNoteSave(topic.id)}
+          rows={1}
+        />
       </div>
     );
   }
@@ -55,6 +65,9 @@ function TopicNode({ topic, progress, onCycle, depth = 0 }) {
           topic={child}
           progress={progress}
           onCycle={onCycle}
+          notes={notes}
+          onNoteChange={onNoteChange}
+          onNoteSave={onNoteSave}
           depth={depth + 1}
         />
       ))}
@@ -62,10 +75,38 @@ function TopicNode({ topic, progress, onCycle, depth = 0 }) {
   );
 }
 
-export default function SubjectClient({ subject, initialProgress, initialWeekGoals, userId }) {
+export default function SubjectClient({
+  subject,
+  initialProgress,
+  initialWeekGoals,
+  initialNotes,
+  userId,
+}) {
   const [progress, setProgress] = useState(initialProgress || {});
   const [weekGoals, setWeekGoals] = useState(initialWeekGoals || {});
+  const [notes, setNotes] = useState(initialNotes || {});
   const supabase = useMemo(() => createClient(), []);
+
+  // Just updates what's on screen as she types — no network call yet.
+  function handleNoteChange(topicKey, value) {
+    setNotes((n) => ({ ...n, [topicKey]: value }));
+  }
+
+  // Saves to Supabase once she taps/clicks away from the note box,
+  // instead of on every keystroke, to keep writes cheap.
+  async function saveNote(topicKey) {
+    const { error } = await supabase.from('topic_notes').upsert(
+      {
+        user_id: userId,
+        subject_id: subject.id,
+        topic_key: topicKey,
+        note: notes[topicKey] || '',
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,topic_key' }
+    );
+    if (error) console.error('Failed to save note', error);
+  }
   const weekly = WEEKLY_CONTENT[subject.id];
 
   // Per-week and overall mastery stats, used for the segmented header bar
@@ -270,6 +311,9 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
                   topic={topic}
                   progress={progress}
                   onCycle={cycleWeeklyStatus}
+                  notes={notes}
+                  onNoteChange={handleNoteChange}
+                  onNoteSave={saveNote}
                 />
               ))
             )}
@@ -286,16 +330,26 @@ export default function SubjectClient({ subject, initialProgress, initialWeekGoa
             const status = progress[key] || 'not_started';
             const meta = STATUS_META[status];
             return (
-              <div className="topic-row" key={key}>
-                <span className="topic-name">{t}</span>
-                <button
-                  className="status-btn"
-                  style={{ background: meta.bg, color: meta.text }}
-                  onClick={() => cycleFlatStatus(idx)}
-                >
-                  <span className="ic">{meta.icon}</span>
-                  {meta.label}
-                </button>
+              <div className="topic-block" key={key}>
+                <div className="topic-row">
+                  <span className="topic-name">{t}</span>
+                  <button
+                    className="status-btn"
+                    style={{ background: meta.bg, color: meta.text }}
+                    onClick={() => cycleFlatStatus(idx)}
+                  >
+                    <span className="ic">{meta.icon}</span>
+                    {meta.label}
+                  </button>
+                </div>
+                <textarea
+                  className="topic-note"
+                  placeholder="Add a note (e.g. 'Needs more work on this part')"
+                  value={notes[key] || ''}
+                  onChange={(e) => handleNoteChange(key, e.target.value)}
+                  onBlur={() => saveNote(key)}
+                  rows={1}
+                />
               </div>
             );
           })}
