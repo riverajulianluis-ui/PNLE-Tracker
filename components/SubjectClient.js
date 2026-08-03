@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { STATUS_ORDER, STATUS_META } from '@/lib/subjects';
@@ -9,6 +9,20 @@ import { WEEKLY_CONTENT } from '@/lib/weeklyContent';
 function FlatTopicItem({ label, meta, note, onCycle, onNoteChange, onNoteSave }) {
   const hasNote = !!(note && note.trim());
   const [showNote, setShowNote] = useState(hasNote);
+  const textareaRef = useRef(null);
+  const shouldFocusRef = useRef(false);
+
+  const handleToggle = () => {
+    shouldFocusRef.current = true;
+    setShowNote((s) => !s);
+  };
+
+  useEffect(() => {
+    if (showNote && shouldFocusRef.current) {
+      textareaRef.current?.focus();
+      shouldFocusRef.current = false;
+    }
+  }, [showNote]);
 
   return (
     <div className="topic-block">
@@ -17,7 +31,7 @@ function FlatTopicItem({ label, meta, note, onCycle, onNoteChange, onNoteSave })
         <div className="topic-actions">
           <button
             className={`note-toggle-btn${hasNote ? ' has-note' : ''}`}
-            onClick={() => setShowNote((s) => !s)}
+            onClick={handleToggle}
           >
             {showNote ? '− Comment' : '+ Comment'}
           </button>
@@ -33,13 +47,13 @@ function FlatTopicItem({ label, meta, note, onCycle, onNoteChange, onNoteSave })
       </div>
       {showNote && (
         <textarea
+          ref={textareaRef}
           className="topic-note"
           placeholder="Add a note (e.g. 'Needs more work on this part')"
           value={note}
           onChange={(e) => onNoteChange(e.target.value)}
           onBlur={onNoteSave}
           rows={1}
-          autoFocus
         />
       )}
     </div>
@@ -59,6 +73,20 @@ function TopicNode({ topic, progress, onCycle, notes, onNoteChange, onNoteSave, 
   const isLeaf = !topic.children || topic.children.length === 0;
   const hasNote = !!(notes[topic.id] && notes[topic.id].trim());
   const [showNote, setShowNote] = useState(hasNote);
+  const textareaRef = useRef(null);
+  const shouldFocusRef = useRef(false);
+
+  const handleToggle = () => {
+    shouldFocusRef.current = true;
+    setShowNote((s) => !s);
+  };
+
+  useEffect(() => {
+    if (showNote && shouldFocusRef.current) {
+      textareaRef.current?.focus();
+      shouldFocusRef.current = false;
+    }
+  }, [showNote]);
 
   if (isLeaf) {
     const status = progress[topic.id] || 'not_started';
@@ -70,7 +98,7 @@ function TopicNode({ topic, progress, onCycle, notes, onNoteChange, onNoteSave, 
           <div className="topic-actions">
             <button
               className={`note-toggle-btn${hasNote ? ' has-note' : ''}`}
-              onClick={() => setShowNote((s) => !s)}
+              onClick={handleToggle}
             >
               {showNote ? '− Comment' : '+ Comment'}
             </button>
@@ -86,13 +114,13 @@ function TopicNode({ topic, progress, onCycle, notes, onNoteChange, onNoteSave, 
         </div>
         {showNote && (
           <textarea
+            ref={textareaRef}
             className="topic-note"
             placeholder="Add a note (e.g. 'Needs more work on this part')"
             value={notes[topic.id] || ''}
             onChange={(e) => onNoteChange(topic.id, e.target.value)}
             onBlur={() => onNoteSave(topic.id)}
             rows={1}
-            autoFocus
           />
         )}
       </div>
