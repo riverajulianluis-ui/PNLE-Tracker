@@ -16,7 +16,12 @@ export async function middleware(request) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request: { headers: request.headers } });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, {
+              ...options,
+              maxAge: 60 * 60 * 24 * 365, // keep the session alive for a year
+              sameSite: 'lax',
+              secure: true,
+            })
           );
         },
       },
